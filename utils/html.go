@@ -21,3 +21,18 @@ func GetOGImage(resp io.ReadCloser) (string, error) {
 
 	return ogImage, nil
 }
+
+func GetTagWithAttribute(resp io.ReadCloser, tag string, attr string) (string, error) {
+	doc, err := goquery.NewDocumentFromReader(resp)
+	if err != nil {
+		return "", err
+	}
+
+	result, ok := doc.Find(tag).Attr(attr)
+
+	if !ok {
+		return "", errors.New("cant find tag")
+	}
+
+	return result, nil
+}

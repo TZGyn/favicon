@@ -30,7 +30,9 @@ func main() {
 		}
 
 		avatar, err := providers.Domain(domain)
+
 		if err != nil {
+			cache_client.Set(domain, providers.Avatar{Data: "Invalid", Data_type: "text/plain"}, cache.DefaultExpiration)
 			return c.SendString("Invalid")
 		}
 
@@ -54,6 +56,7 @@ func main() {
 		avatar, err := providers.YoutubeChannel(channel)
 
 		if err != nil {
+			cache_client.Set("yt-"+channel, providers.Avatar{Data: "Invalid", Data_type: "text/plain"}, cache.DefaultExpiration)
 			return c.SendString("Invalid")
 		}
 
@@ -77,6 +80,7 @@ func main() {
 		avatar, err := providers.TwitchChannel(channel)
 
 		if err != nil {
+			cache_client.Set("twitch-"+channel, providers.Avatar{Data: "Invalid", Data_type: "text/plain"}, cache.DefaultExpiration)
 			return c.SendString("Invalid")
 		}
 
@@ -99,12 +103,36 @@ func main() {
 		avatar, err := providers.GithubAccount(account)
 
 		if err != nil {
+			cache_client.Set("gh-"+account, providers.Avatar{Data: "Invalid", Data_type: "text/plain"}, cache.DefaultExpiration)
 			return c.SendString("Invalid")
 		}
 
 		c.Response().Header.Set("Content-Type", avatar.Data_type)
 
 		cache_client.Set("gh-"+account, avatar, cache.DefaultExpiration)
+
+		return c.SendString(avatar.Data)
+	})
+
+	app.Get("/reddit/:account", func(c *fiber.Ctx) error {
+		account := c.Params("account")
+		cached_result, found := cache_client.Get("reddit-" + account)
+
+		if found {
+			c.Response().Header.Set("Content-Type", cached_result.(providers.Avatar).Data_type)
+			return c.SendString(cached_result.(providers.Avatar).Data)
+		}
+
+		avatar, err := providers.RedditAccount(account)
+
+		if err != nil {
+			cache_client.Set("reddit-"+account, providers.Avatar{Data: "Invalid", Data_type: "text/plain"}, cache.DefaultExpiration)
+			return c.SendString("Invalid")
+		}
+
+		c.Response().Header.Set("Content-Type", avatar.Data_type)
+
+		cache_client.Set("reddit-"+account, avatar, cache.DefaultExpiration)
 
 		return c.SendString(avatar.Data)
 	})
