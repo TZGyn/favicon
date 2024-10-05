@@ -2,7 +2,7 @@ package providers
 
 import (
 	"net/http"
-	"tzgyn/favicon/utils"
+	"tzgyn/webatar/utils"
 )
 
 func RedditAccount(account string) (Avatar, error) {

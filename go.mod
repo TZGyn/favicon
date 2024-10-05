@@ -1,4 +1,4 @@
-module tzgyn/favicon
+module tzgyn/webatar
 
 go 1.23
 

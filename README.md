@@ -1,6 +1,7 @@
 <h1 align="center">
-	Favicon
+	Webatar
 </h1>
+Fetching avatar from any website
 
 ## API
 

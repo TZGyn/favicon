@@ -2,7 +2,7 @@ package providers
 
 import (
 	"fmt"
-	"tzgyn/favicon/utils"
+	"tzgyn/webatar/utils"
 )
 
 func GithubAccount(account string) (Avatar, error) {
