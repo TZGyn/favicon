@@ -137,5 +137,28 @@ func main() {
 		return c.SendString(avatar.Data)
 	})
 
+	app.Get("/x/:account", func(c *fiber.Ctx) error {
+		account := c.Params("account")
+		cached_result, found := cache_client.Get("x-" + account)
+
+		if found {
+			c.Response().Header.Set("Content-Type", cached_result.(providers.Avatar).Data_type)
+			return c.SendString(cached_result.(providers.Avatar).Data)
+		}
+
+		avatar, err := providers.XAccount(account)
+
+		if err != nil {
+			cache_client.Set("x-"+account, providers.Avatar{Data: "Invalid", Data_type: "text/plain"}, cache.DefaultExpiration)
+			return c.SendString("Invalid")
+		}
+
+		c.Response().Header.Set("Content-Type", avatar.Data_type)
+
+		cache_client.Set("x-"+account, avatar, cache.DefaultExpiration)
+
+		return c.SendString(avatar.Data)
+	})
+
 	app.Listen(":3000")
 }
