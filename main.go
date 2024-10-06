@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/url"
 	"time"
 	"tzgyn/webatar/providers"
 
@@ -21,6 +22,11 @@ func main() {
 
 	app.Get("/:domain", func(c *fiber.Ctx) error {
 		domain := c.Params("domain")
+
+		domain, err := url.QueryUnescape(domain)
+		if err != nil {
+			return c.SendString("Invalid")
+		}
 
 		cached_result, found := cache_client.Get(domain)
 
